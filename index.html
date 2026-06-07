@@ -746,8 +746,9 @@ function bindStatusPills() {
           if (SCRIPT_URL) {
             try {
               const [fecha,hora,actividad]=key.split('|');
-              await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({accion:'estado',fecha,hora,actividad,estado:newStatus})});
-              showToast('✓ Estado guardado en Google Sheets');
+              const url=SCRIPT_URL+'?accion=estado&fecha='+encodeURIComponent(fecha)+'&hora='+encodeURIComponent(hora)+'&actividad='+encodeURIComponent(actividad)+'&estado='+encodeURIComponent(newStatus);
+              await fetch(url,{mode:'no-cors'});
+              showToast('✓ Estado actualizado en Google Sheets');
             } catch { showToast('⚠️ Guardado solo en este dispositivo'); }
           } else {
             showToast(`Estado: ${newStatus}`);
@@ -820,12 +821,11 @@ document.getElementById('btnGuardar').addEventListener('click', async ()=>{
 
   if (SCRIPT_URL) {
     try {
-      await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({
-        accion:'nueva',fecha:fechaFmt,dia:diaCapit,hora,modalidad,actividad,lugar,participantes,estado
-      })});
+      const url=SCRIPT_URL+'?accion=nueva&fecha='+encodeURIComponent(fechaFmt)+'&dia='+encodeURIComponent(diaCapit)+'&hora='+encodeURIComponent(hora)+'&modalidad='+encodeURIComponent(modalidad)+'&actividad='+encodeURIComponent(actividad)+'&lugar='+encodeURIComponent(lugar)+'&participantes='+encodeURIComponent(participantes)+'&estado='+encodeURIComponent(estado);
+      await fetch(url,{mode:'no-cors'});
       showToast('✓ Actividad guardada en Google Sheets');
       addModal.classList.remove('open');
-      await loadData();
+      setTimeout(()=>loadData(), 2000);
     } catch {
       msg.textContent='⚠️ No se pudo guardar. Configura el Script primero.';
     }
