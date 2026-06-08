@@ -703,6 +703,16 @@ function render() {
   }
 }
 
+// ── Llamada a Google Script (sin CORS) ───────────────────────────
+function callScript(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = img.onerror = () => resolve(true);
+    img.src = url + '&img=1&t=' + Date.now();
+    setTimeout(() => resolve(false), 5000);
+  });
+}
+
 // ── Status dropdown ──────────────────────────────────────────────
 function closeDropdown() {
   if (activeDropdown) { activeDropdown.remove(); activeDropdown=null; }
@@ -714,7 +724,6 @@ function bindStatusPills() {
       e.stopPropagation();
       closeDropdown();
       const key=pill.dataset.key;
-      const card=pill.closest('.event-card');
       const current=getStatus(allEvents.find(ev=>eventKey(ev)===key)||{});
       const opts=[
         {s:'Confirmada',color:'#1b5e20',dot:'#4caf50'},
@@ -730,13 +739,13 @@ function bindStatusPills() {
           ${current===o.s?' ✔':''}
         </div>`).join('');
       document.body.appendChild(dd);
-      // Position near the pill
       const rect=pill.getBoundingClientRect();
       const ddH=opts.length*44;
       const top=rect.bottom+4+ddH>window.innerHeight ? rect.top-ddH-4 : rect.bottom+4;
       dd.style.top=top+'px';
       dd.style.left=Math.min(rect.left, window.innerWidth-190)+'px';
       activeDropdown=dd;
+
       dd.querySelectorAll('.status-option').forEach(opt=>{
         opt.addEventListener('click', async ev=>{
           ev.stopPropagation();
@@ -744,17 +753,36 @@ function bindStatusPills() {
           statusOverrides[key]=newStatus;
           localStorage.setItem('statusOverrides',JSON.stringify(statusOverrides));
           closeDropdown();
-          if (SCRIPT_URL) {
-            try {
-              const [fecha,hora,actividad]=key.split('|');
-              const url=SCRIPT_URL+'?accion=estado&fecha='+encodeURIComponent(fecha)+'&hora='+encodeURIComponent(hora)+'&actividad='+encodeURIComponent(actividad)+'&estado='+encodeURIComponent(newStatus);
-              await fetch(url,{mode:'no-cors'});
-              showToast('✓ Estado actualizado en Google Sheets');
-            } catch { showToast('⚠️ Guardado solo en este dispositivo'); }
-          } else {
-            showToast(`Estado: ${newStatus}`);
+
+          // Actualizar tarjeta en el lugar SIN recargar toda la vista
+          const card=document.querySelector(`.event-card[data-key="${key}"]`);
+          if (card) {
+            const p=card.querySelector('.status-pill');
+            if (p) {
+              p.className=`status-pill ${statusPillClass(newStatus)}`;
+              p.innerHTML=`${statusEmoji(newStatus)} ${newStatus} <span class="chevron">▾</span>`;
+            }
+            if (newStatus==='Cancelada') {
+              card.classList.add('cancelada');
+              card.querySelector('.card-title')&&(card.querySelector('.card-title').style.textDecoration='line-through');
+            } else {
+              card.classList.remove('cancelada');
+              card.querySelector('.card-title')&&(card.querySelector('.card-title').style.textDecoration='');
+            }
           }
-          updateHeaderStats(); buildTabs(); render();
+
+          updateHeaderStats();
+          buildTabs();
+
+          // Sincronizar con Google Sheets
+          if (SCRIPT_URL) {
+            const [fecha,hora,actividad]=key.split('|');
+            const url=SCRIPT_URL+'?accion=estado&fecha='+encodeURIComponent(fecha)+'&hora='+encodeURIComponent(hora)+'&actividad='+encodeURIComponent(actividad)+'&estado='+encodeURIComponent(newStatus);
+            callScript(url);
+            showToast('✓ Estado actualizado');
+          } else {
+            showToast('Estado: '+newStatus);
+          }
         });
       });
     });
