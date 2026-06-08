@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Agenda Presidenta" />
-  <title>Agenda Presidenta Gloria Negroni</title>
+  <title>Agenda Presidenta Gloria Negroni v3</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -771,18 +771,14 @@ function bindStatusPills() {
             }
           }
 
-          updateHeaderStats();
-          buildTabs();
-
           // Sincronizar con Google Sheets
           if (SCRIPT_URL) {
-            const [fecha,hora,actividad]=key.split('|');
+            const [fecha,hora,...actParts]=key.split('|');
+            const actividad=actParts.join('|');
             const url=SCRIPT_URL+'?accion=estado&fecha='+encodeURIComponent(fecha)+'&hora='+encodeURIComponent(hora)+'&actividad='+encodeURIComponent(actividad)+'&estado='+encodeURIComponent(newStatus);
             callScript(url);
-            showToast('✓ Estado actualizado');
-          } else {
-            showToast('Estado: '+newStatus);
           }
+          showToast('✓ Estado: '+newStatus);
         });
       });
     });
