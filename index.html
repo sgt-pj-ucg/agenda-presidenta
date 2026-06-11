@@ -658,7 +658,7 @@ function renderCalendar() {
   let detail='';
   if(selectedCalDate){
     const ds=`${String(selectedCalDate.getDate()).padStart(2,'0')}/${String(selectedCalDate.getMonth()+1).padStart(2,'0')}/${selectedCalDate.getFullYear()}`;
-    const dayEvts=allEvents.filter(e=>e.FECHA===ds).sort((a,b)=>{if(!a.HORA)return -1;if(!b.HORA)return 1;return a.HORA.localeCompare(b.HORA);});
+    const dayEvts=allEvents.filter(e=>e.FECHA===ds).sort((a,b)=>timeToMin(a.HORA)-timeToMin(b.HORA));
     const label=selectedCalDate.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
     detail=`<div style="margin-top:14px;border-top:1px solid #eee;padding-top:12px">
       <div style="font-size:13px;font-weight:700;color:#777;margin-bottom:10px;text-transform:capitalize">${label}</div>
