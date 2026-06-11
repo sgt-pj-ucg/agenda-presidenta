@@ -577,6 +577,7 @@ function badgeClass(m) {
   const ml=m.toLowerCase();
   return ml.includes('zoom')?'b-zoom':ml.includes('presencial')?'b-presencial':'b-otro';
 }
+function timeToMin(t) { if(!t)return -1; const p=t.split(':'); return (parseInt(p[0])||0)*60+(parseInt(p[1])||0); }
 function statusEmoji(s) { return s==='Confirmada'?'✓':s==='Pendiente'?'⏳':'✕'; }
 function statusPillClass(s) { return s==='Pendiente'?'s-pendiente':s==='Cancelada'?'s-cancelada':'s-confirmada'; }
 
@@ -620,7 +621,7 @@ function renderGroups(events) {
     const dayName=date?date.toLocaleDateString('es-CL',{weekday:'long'}):'';
     const dayNum=date?date.getDate():'';
     const monName=date?date.toLocaleDateString('es-CL',{month:'short'}):'';
-    const sorted=grouped[key].sort((a,b)=>{if(!a.HORA)return -1;if(!b.HORA)return 1;return a.HORA.localeCompare(b.HORA);});
+    const sorted=grouped[key].sort((a,b)=>timeToMin(a.HORA)-timeToMin(b.HORA));
     return `<div class="date-group">
       <div class="date-header">
         <div class="date-circle"><div class="day-num">${dayNum}</div><div class="day-mon">${monName}</div></div>
@@ -703,14 +704,22 @@ function render() {
   }
 }
 
-// ── Llamada a Google Script (sin CORS) ───────────────────────────
+// ── Llamada a Google Script (triple método para máxima confiabilidad) ──
 function callScript(url) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = img.onerror = () => resolve(true);
-    img.src = url + '&img=1&t=' + Date.now();
-    setTimeout(() => resolve(false), 5000);
-  });
+  const t = Date.now();
+  // Método 1: fetch sin-cors
+  fetch(url + '&m=1&t=' + t, {mode:'no-cors'}).catch(()=>{});
+  // Método 2: imagen (bypass CORS)
+  const img = new Image();
+  img.src = url + '&m=2&t=' + (t+1);
+  // Método 3: iframe oculto
+  try {
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'display:none;width:0;height:0;border:0';
+    fr.src = url + '&m=3&t=' + (t+2);
+    document.body.appendChild(fr);
+    setTimeout(()=>{ try{document.body.removeChild(fr);}catch(e){} }, 8000);
+  } catch(e) {}
 }
 
 // ── Status dropdown ──────────────────────────────────────────────
