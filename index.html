@@ -1055,11 +1055,18 @@ function parseSpanishQuery(q) {
 function searchEvents(query) {
   if (!query.trim()) return null;
   const {targetDate,rawQuery}=parseSpanishQuery(query);
-  return allEvents.filter(e=>{
-    if (targetDate){const d=parseDate(e.FECHA);return d&&sameDay(d,targetDate);}
-    const text=[e.ACTIVIDAD,e.LUGAR,e.PARTICIPANTES,e.MODALIDAD,e.FECHA].join(' ').toLowerCase();
-    return rawQuery.split(' ').filter(w=>w.length>2).some(w=>text.includes(w));
-  });
+  // Si se detectó fecha, filtrar solo por fecha
+  if (targetDate) return allEvents.filter(e=>{const d=parseDate(e.FECHA);return d&&sameDay(d,targetDate);});
+  const getText=e=>[e.ACTIVIDAD,e.LUGAR,e.PARTICIPANTES,e.MODALIDAD].join(' ').toLowerCase();
+  const words=rawQuery.split(' ').filter(w=>w.length>2);
+  // Nivel 1: frase exacta completa
+  let res=allEvents.filter(e=>getText(e).includes(rawQuery));
+  if (res.length) return res;
+  // Nivel 2: todas las palabras clave presentes (AND)
+  res=allEvents.filter(e=>{const t=getText(e);return words.length>0&&words.every(w=>t.includes(w));});
+  if (res.length) return res;
+  // Nivel 3: fallback — al menos una palabra coincide (OR)
+  return allEvents.filter(e=>{const t=getText(e);return words.some(w=>t.includes(w));});
 }
 
 const searchInput=document.getElementById('searchInput');
