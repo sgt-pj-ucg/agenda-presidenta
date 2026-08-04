@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Agenda Presidenta" />
-  <title>Agenda Presidenta Gloria Negroni v3</title>
+  <title>Agenda Presidenta Gloria Negroni v4</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -447,6 +447,112 @@
       box-shadow:0 8px 28px rgba(0,0,0,0.45);
     }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+
+    /* ── ACTUALIZACIÓN V4 · MODALIDADES, GESTIÓN Y UX ─────────── */
+    :root {
+      --telematica:#4d9fff; --telematica-bg:rgba(77,159,255,.15);
+      --hibrida:#a78bfa; --hibrida-bg:rgba(167,139,250,.16);
+      --special:#ffd54a; --special-bg:rgba(255,213,74,.16);
+      --por-confirmar:#d6a8ff; --por-confirmar-bg:rgba(214,168,255,.14);
+    }
+    html { scroll-behavior:smooth; }
+    body { background:linear-gradient(150deg,#101d49 0%,#17326d 48%,#111b42 100%); }
+    button, input, select, textarea { font:inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline:3px solid rgba(240,192,64,.35); outline-offset:2px;
+    }
+    .app-header { position:sticky; }
+    .tab { background:none; border-left:0; border-right:0; border-top:0; font-family:inherit; }
+    .cal-cell { border:0; background:transparent; padding:0; font-family:inherit; }
+    .status-option { width:100%; background:none; border-left:0; border-right:0; border-top:0; text-align:left; font-family:inherit; }
+    .content { max-width:720px; padding-bottom:24px; }
+
+    .event-card.telematica { border-left-color:var(--telematica); box-shadow:0 8px 28px rgba(0,0,0,.16),-2px 0 24px rgba(77,159,255,.22),0 2px 8px rgba(255,255,255,.06) inset; }
+    .event-card.hibrida { border-left-color:var(--hibrida); box-shadow:0 8px 28px rgba(0,0,0,.16),-2px 0 24px rgba(167,139,250,.24),0 2px 8px rgba(255,255,255,.06) inset; }
+    .event-card.special {
+      background:linear-gradient(145deg,rgba(255,213,74,.24),rgba(255,181,35,.12));
+      border-color:rgba(255,224,112,.55); border-left-color:var(--special);
+      box-shadow:0 10px 34px rgba(0,0,0,.22),-2px 0 28px rgba(255,213,74,.35),inset 0 1px 0 rgba(255,255,255,.18);
+    }
+    .event-card.special .card-title { color:#fff8d8; }
+    .event-card.special .time-bubble { background:rgba(103,72,0,.35); border-color:rgba(255,224,112,.42); }
+    .event-card.special .time-bubble .t-hour { color:#ffe58a; }
+
+    .mode-banner {
+      color:#fff; font-size:11px; font-weight:800; padding:8px 14px;
+      display:flex; align-items:center; gap:8px; letter-spacing:.65px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .mode-banner .mode-icon {
+      width:25px; height:25px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22); flex-shrink:0;
+    }
+    .mode-presencial { background:linear-gradient(90deg,rgba(0,120,90,.78),rgba(0,160,120,.52)); }
+    .mode-telematica { background:linear-gradient(90deg,rgba(15,65,180,.80),rgba(25,90,220,.54)); }
+    .mode-hibrida { background:linear-gradient(90deg,rgba(83,49,154,.82),rgba(126,87,194,.55)); }
+    .mode-otro { background:linear-gradient(90deg,rgba(150,70,15,.78),rgba(210,105,30,.52)); }
+    .mode-special { color:#3b2a00; background:linear-gradient(90deg,#ffd54a,#ffb92f); border-bottom-color:rgba(90,58,0,.18); }
+    .mode-special .mode-icon { background:rgba(255,255,255,.38); border-color:rgba(90,58,0,.18); }
+
+    .b-telematica { background:var(--telematica-bg); color:#77b7ff; border:1px solid rgba(77,159,255,.28); }
+    .b-hibrida { background:var(--hibrida-bg); color:#c4b5fd; border:1px solid rgba(167,139,250,.30); }
+    .b-special { background:rgba(255,213,74,.17); color:#ffe071; border:1px solid rgba(255,213,74,.28); }
+
+    .status-row { gap:10px; }
+    .s-por-confirmar { background:var(--por-confirmar-bg); color:var(--por-confirmar); border-color:rgba(214,168,255,.28); }
+    .event-actions { margin-left:auto; display:flex; gap:7px; }
+    .card-action {
+      width:36px; height:34px; border-radius:11px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      color:rgba(255,255,255,.72); background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.11); transition:transform .18s,background .18s,color .18s;
+    }
+    .card-action:hover { color:#fff; background:rgba(255,255,255,.14); transform:translateY(-1px); }
+    .card-action.delete:hover { color:#ff9ba4; background:rgba(255,71,87,.13); border-color:rgba(255,71,87,.24); }
+    .card-action svg { width:17px; height:17px; }
+
+    .cal-cell.has-special:not(.today) {
+      color:#ffe071; background:rgba(255,213,74,.12); border:1px solid rgba(255,213,74,.25); font-weight:800;
+    }
+    .cal-cell.has-special::after { background:var(--special); box-shadow:0 0 9px rgba(255,213,74,.7); }
+    .calendar-legend { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; font-size:10px; color:rgba(255,255,255,.42); }
+    .legend-item { display:flex; align-items:center; gap:5px; }
+    .legend-dot { width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 6px currentColor; }
+    .legend-dot.special { background:var(--special); }
+
+    .modal { padding-bottom:max(30px,env(safe-area-inset-bottom)); }
+    .modal-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .modal-heading h2 { margin:0; }
+    .modal-subtitle { color:rgba(255,255,255,.40); font-size:12px; margin-top:4px; line-height:1.4; }
+    .modal-close {
+      width:36px; height:36px; border-radius:11px; border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06); color:rgba(255,255,255,.58); cursor:pointer; font-size:18px;
+    }
+    .required-note { font-size:11px; color:rgba(255,255,255,.32); margin:-4px 0 14px; }
+    .form-msg { text-align:center; min-height:18px; font-size:12px; color:#ffd66b; margin-top:10px; }
+    .btn-danger {
+      width:100%; padding:14px; border:none; border-radius:15px; cursor:pointer;
+      background:linear-gradient(145deg,#ff6472,#d93648); color:white; font-size:15px; font-weight:800;
+      box-shadow:0 5px 20px rgba(217,54,72,.25); margin-top:8px;
+    }
+    .btn-secondary {
+      width:100%; padding:13px; border-radius:14px; cursor:pointer;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.11);
+      color:rgba(255,255,255,.72); font-weight:700; margin-top:8px;
+    }
+    .confirm-copy { color:rgba(255,255,255,.68); font-size:14px; line-height:1.6; margin:2px 0 12px; }
+    .confirm-activity { color:#fff; font-weight:800; }
+    .sync-note { font-size:10px; color:rgba(255,255,255,.27); text-align:center; margin-top:8px; }
+
+    @media (min-width:760px) {
+      .event-card:hover { transform:translateY(-2px); box-shadow:0 14px 38px rgba(0,0,0,.25); }
+      .modal-overlay { align-items:center; padding:24px; }
+      .modal { border-radius:26px; border:1px solid rgba(255,255,255,.11); max-width:620px; transform:translateY(24px) scale(.98); }
+      .modal-overlay.open .modal { transform:translateY(0) scale(1); }
+      .modal-handle { display:none; }
+    }
+
   </style>
 </head>
 <body>
@@ -548,53 +654,82 @@
   </button>
 </nav>
 
-<!-- MODAL: Nueva actividad -->
-<div class="modal-overlay" id="addModal">
+<!-- MODAL: Nueva / editar actividad -->
+<div class="modal-overlay" id="activityModal" role="dialog" aria-modal="true" aria-labelledby="activityModalTitle">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h2>➕ Nueva Actividad</h2>
+    <div class="modal-heading">
+      <div>
+        <h2 id="activityModalTitle">➕ Nueva actividad</h2>
+        <div class="modal-subtitle" id="activityModalSubtitle">Registra la actividad y sus antecedentes principales.</div>
+      </div>
+      <button class="modal-close" id="btnCloseActivityModal" type="button" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="required-note">Los campos marcados con * son obligatorios.</div>
     <div class="form-row">
       <div class="form-group">
-        <label>Fecha *</label>
+        <label for="fFecha">Fecha *</label>
         <input type="date" id="fFecha" />
       </div>
       <div class="form-group">
-        <label>Hora</label>
+        <label for="fHora">Hora</label>
         <input type="time" id="fHora" />
       </div>
     </div>
     <div class="form-group">
-      <label>Actividad *</label>
-      <input type="text" id="fActividad" placeholder="Nombre de la actividad" />
+      <label for="fActividad">Actividad *</label>
+      <input type="text" id="fActividad" placeholder="Nombre de la actividad" maxlength="250" />
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Modalidad</label>
+        <label for="fModalidad">Modalidad</label>
         <select id="fModalidad">
           <option>Presencial</option>
-          <option>Zoom</option>
+          <option>Telemática</option>
+          <option>Híbrida</option>
           <option>Otro</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Estado</label>
+        <label for="fEstado">Estado</label>
         <select id="fEstado">
           <option>Confirmada</option>
+          <option>Por Confirmar</option>
           <option>Pendiente</option>
+          <option>Cancelada</option>
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label>Lugar</label>
-      <input type="text" id="fLugar" placeholder="Ej: Sala de Reuniones" />
+      <label for="fLugar">Lugar o enlace</label>
+      <input type="text" id="fLugar" placeholder="Ej.: Sala de reuniones o enlace de conexión" maxlength="250" />
     </div>
     <div class="form-group">
-      <label>Participantes</label>
-      <input type="text" id="fParticipantes" placeholder="Nombres separados por coma" />
+      <label for="fParticipantes">Participantes</label>
+      <input type="text" id="fParticipantes" placeholder="Nombres separados por coma" maxlength="500" />
     </div>
-    <button class="btn-submit" id="btnGuardar">Guardar en Google Sheets</button>
-    <button class="btn-cancel-modal" id="btnCancelarModal">Cancelar</button>
-    <p id="formMsg" style="text-align:center;font-size:12px;color:#999;margin-top:10px"></p>
+    <button class="btn-submit" id="btnGuardar" type="button">Guardar actividad</button>
+    <button class="btn-cancel-modal" id="btnCancelarModal" type="button">Cancelar</button>
+    <p id="formMsg" class="form-msg" aria-live="polite"></p>
+    <div class="sync-note">Los cambios se sincronizan con la planilla institucional.</div>
+  </div>
+</div>
+
+<!-- MODAL: Confirmar eliminación -->
+<div class="modal-overlay" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-handle"></div>
+    <div class="modal-heading">
+      <div>
+        <h2 id="deleteModalTitle">🗑️ Eliminar actividad</h2>
+        <div class="modal-subtitle">Esta acción retirará la actividad de la agenda y de la planilla.</div>
+      </div>
+      <button class="modal-close" id="btnCloseDeleteModal" type="button" aria-label="Cerrar">✕</button>
+    </div>
+    <p class="confirm-copy">¿Confirmas la eliminación de <span class="confirm-activity" id="deleteActivityName"></span>?</p>
+    <button class="btn-danger" id="btnConfirmDelete" type="button">Sí, eliminar actividad</button>
+    <button class="btn-secondary" id="btnCancelDelete" type="button">Mantener actividad</button>
+    <p id="deleteMsg" class="form-msg" aria-live="polite"></p>
   </div>
 </div>
 
@@ -602,519 +737,608 @@
 
 <script>
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTS475HlSXSv9KO7xSo8MnDd8fMBbz93oLJAXKRJGpIWjG88nNF2RX1dJwBq3Evw47kmxeGnKJgRQIk/pub?output=csv';
-// Pega aquí tu URL de Google Apps Script cuando la configures:
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTAbGCdAkQdQ1hd5C8lx3lS1ONOMZIRWsVIF9mJCweWPBjNt2VEiPM_4GUmr4qQx7riA/exec';
 
 let allEvents = [];
-let statusOverrides = JSON.parse(localStorage.getItem('statusOverrides') || '{}');
 let currentTab = 'hoy';
-let currentView = 'agenda'; // 'agenda' | 'calendario' | 'buscar' | 'mes'
+let currentView = 'agenda';
 let calendarDate = new Date();
 let selectedCalDate = null;
 let activeDropdown = null;
+let editingEvent = null;
+let pendingDeleteEvent = null;
+let refreshTimer = null;
 
 const CATEGORIES = [
-  { id:'reuniones',  label:'Reuniones',  icon:'🤝', keywords:['reunión','reunion','reuniones'] },
-  { id:'visitas',    label:'Visitas',    icon:'👋', keywords:['visita','visitas'] },
+  { id:'reuniones', label:'Reuniones', icon:'🤝', keywords:['reunión','reunion','reuniones'] },
+  { id:'visitas', label:'Visitas', icon:'👋', keywords:['visita','visitas'] },
   { id:'audiencias', label:'Audiencias', icon:'⚖️', keywords:['audiencia','audiencias'] },
-  { id:'pleno',      label:'Pleno',      icon:'🏛',  keywords:['pleno'] },
-  { id:'seminarios', label:'Seminarios', icon:'🎓', keywords:['seminario','seminarios','capacitación','capacitacion','curso','cursos'] },
+  { id:'pleno', label:'Pleno', icon:'🏛', keywords:['pleno'] },
+  { id:'seminarios', label:'Cursos', icon:'🎓', keywords:['seminario','seminarios','capacitación','capacitacion','curso','cursos','diplomado'] },
 ];
 
 const FIXED_TABS = [
-  { id:'hoy',    label:'Hoy',    icon:'📅' },
+  { id:'hoy', label:'Hoy', icon:'📅' },
   { id:'manana', label:'Mañana', icon:'⏭' },
   { id:'semana', label:'Semana', icon:'📆' },
 ];
 
-// ── CSV ──────────────────────────────────────────────────────────
+const SPECIAL_KEYWORDS = [
+  'permiso','permisos','vacación','vacacion','vacaciones','feriado legal',
+  'curso','cursos','capacitación','capacitacion','diplomado','academia judicial'
+];
+
+const STATUS_OPTIONS = [
+  {s:'Confirmada', color:'#70f0a3', dot:'#00e676', icon:'✓'},
+  {s:'Por Confirmar', color:'#d6a8ff', dot:'#b978f0', icon:'?'},
+  {s:'Pendiente', color:'#ffc45a', dot:'#ffb300', icon:'⏳'},
+  {s:'Cancelada', color:'#ff8994', dot:'#ff4757', icon:'✕'},
+];
+
+function escapeHTML(value='') {
+  return String(value).replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+}
+
 function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
-  return lines.slice(1).map((line, idx) => {
-    const cols=[]; let cur='', inQ=false;
-    for (let c of line) {
-      if (c==='"') inQ=!inQ;
-      else if (c===',' && !inQ) { cols.push(cur.trim()); cur=''; }
-      else cur+=c;
-    }
-    cols.push(cur.trim());
+  const rows=[];
+  let row=[], cell='', quoted=false;
+  const source=String(text||'').replace(/^\uFEFF/, '');
+  for (let i=0;i<source.length;i++) {
+    const char=source[i];
+    if (char==='"') {
+      if (quoted && source[i+1]==='"') { cell+='"'; i++; }
+      else quoted=!quoted;
+    } else if (char===',' && !quoted) {
+      row.push(cell.trim()); cell='';
+    } else if ((char==='\n' || char==='\r') && !quoted) {
+      if (char==='\r' && source[i+1]==='\n') i++;
+      row.push(cell.trim());
+      rows.push(row);
+      row=[]; cell='';
+    } else cell+=char;
+  }
+  if (cell!=='' || row.length) { row.push(cell.trim()); rows.push(row); }
+  while (rows.length && rows[rows.length-1].every(value=>value==='')) rows.pop();
+  if (!rows.length) return [];
+  const headers=rows[0].map(h=>h.trim().toUpperCase());
+  return rows.slice(1).map((cols,idx)=>{
     const obj={_row:idx+2};
-    headers.forEach((h,i) => obj[h]=(cols[i]||'').replace(/^"|"$/g,'').trim());
+    headers.forEach((header,i)=>obj[header]=(cols[i]||'').trim());
+    obj.MODALIDAD=normalizeModality(obj.MODALIDAD);
+    obj.ESTADO=normalizeStatus(obj.ESTADO);
     return obj;
-  }).filter(e=>e['FECHA']&&e['ACTIVIDAD']);
+  }).filter(e=>e.FECHA&&e.ACTIVIDAD);
 }
 
 function parseDate(str) {
   if (!str) return null;
-  const [d,m,y]=str.split('/');
+  const [d,m,y]=String(str).split('/').map(Number);
   if (!d||!m||!y) return null;
-  return new Date(parseInt(y),parseInt(m)-1,parseInt(d));
-}
-function sameDay(a,b) { return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
-function eventKey(e) { return `${e.FECHA}|${e.HORA}|${e.ACTIVIDAD}`; }
-function getStatus(e) { return statusOverrides[eventKey(e)]||e.ESTADO||'Confirmada'; }
-
-function formatTime(t) {
-  if (!t) return '';
-  // Handle HH:MM:SS or H:MM:SS → HH:MM
-  const parts = t.split(':');
-  if (parts.length >= 2) {
-    const h = parts[0].replace(/\D/g,'');
-    const m = parts[1].replace(/\D/g,'');
-    if (h.length <= 2 && parseInt(h) < 24) return `${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
-  }
-  return t;
+  const date=new Date(y,m-1,d);
+  return Number.isNaN(date.getTime())?null:date;
 }
 
-// ── Filtros ──────────────────────────────────────────────────────
+function dateToInput(str) {
+  const date=parseDate(str);
+  if (!date) return '';
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+
+function inputToDate(value) {
+  const [y,m,d]=String(value).split('-');
+  return y&&m&&d?`${d}/${m}/${y}`:'';
+}
+
+function dayNameFromInput(value) {
+  const [y,m,d]=String(value).split('-').map(Number);
+  const name=new Date(y,m-1,d).toLocaleDateString('es-CL',{weekday:'long'});
+  return name.charAt(0).toUpperCase()+name.slice(1);
+}
+
+function sameDay(a,b) {
+  return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+}
+
+function normalizeModality(value) {
+  const raw=String(value||'').trim();
+  const lower=raw.toLowerCase();
+  if (lower.includes('zoom') || lower.includes('telem') || lower.includes('virtual')) return 'Telemática';
+  if (lower.includes('híbr') || lower.includes('hibr')) return 'Híbrida';
+  if (lower.includes('presencial')) return 'Presencial';
+  return raw || 'Otro';
+}
+
+function normalizeStatus(value) {
+  const raw=String(value||'').trim();
+  const lower=raw.toLowerCase();
+  if (lower==='por confirmar' || lower==='por confirmar.') return 'Por Confirmar';
+  if (lower==='pendiente') return 'Pendiente';
+  if (lower==='cancelada' || lower==='cancelado') return 'Cancelada';
+  return raw || 'Confirmada';
+}
+
+function eventKey(event) {
+  return `${event._row||''}|${event.FECHA||''}|${event.HORA||''}|${event.ACTIVIDAD||''}`;
+}
+
+function getStatus(event) { return normalizeStatus(event.ESTADO); }
+
+function isSpecialActivity(event) {
+  const text=[event.TIPO,event.CATEGORIA,event.ACTIVIDAD].filter(Boolean).join(' ').toLowerCase();
+  return SPECIAL_KEYWORDS.some(keyword=>text.includes(keyword));
+}
+
+function formatTime(value) {
+  if (!value) return '';
+  const match=String(value).match(/(\d{1,2}):(\d{2})/);
+  if (!match) return String(value);
+  return `${match[1].padStart(2,'0')}:${match[2]}`;
+}
+
+function timeToMin(value) {
+  if (!value) return -1;
+  const match=String(value).match(/(\d{1,2}):(\d{2})/);
+  return match?(Number(match[1])*60+Number(match[2])):-1;
+}
+
+function modalityMeta(value) {
+  const modality=normalizeModality(value);
+  if (modality==='Presencial') return {className:'presencial',badge:'b-presencial',icon:'📍',label:'ACTIVIDAD PRESENCIAL'};
+  if (modality==='Telemática') return {className:'telematica',badge:'b-telematica',icon:'💻',label:'ACTIVIDAD TELEMÁTICA'};
+  if (modality==='Híbrida') return {className:'hibrida',badge:'b-hibrida',icon:'🔀',label:'ACTIVIDAD HÍBRIDA'};
+  return {className:'otro',badge:'b-otro',icon:'📌',label:'OTRA MODALIDAD'};
+}
+
+function statusEmoji(status) {
+  return status==='Confirmada'?'✓':status==='Por Confirmar'?'?':status==='Pendiente'?'⏳':'✕';
+}
+
+function statusPillClass(status) {
+  if (status==='Por Confirmar') return 's-por-confirmar';
+  if (status==='Pendiente') return 's-pendiente';
+  if (status==='Cancelada') return 's-cancelada';
+  return 's-confirmada';
+}
+
 function filterEvents(tab) {
   const today=new Date(); today.setHours(0,0,0,0);
-  const tom=new Date(today); tom.setDate(today.getDate()+1);
-  let ev=allEvents;
-  if (tab==='hoy') ev=ev.filter(e=>{const d=parseDate(e.FECHA);return d&&sameDay(d,today);});
-  else if (tab==='manana') ev=ev.filter(e=>{const d=parseDate(e.FECHA);return d&&sameDay(d,tom);});
+  const tomorrow=new Date(today); tomorrow.setDate(today.getDate()+1);
+  let events=[...allEvents];
+  if (tab==='hoy') events=events.filter(e=>sameDay(parseDate(e.FECHA),today));
+  else if (tab==='manana') events=events.filter(e=>sameDay(parseDate(e.FECHA),tomorrow));
   else if (tab==='semana') {
     const dow=today.getDay();
-    const mon=new Date(today); mon.setDate(today.getDate()+(dow===0?-6:1-dow));
-    const sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999);
-    ev=ev.filter(e=>{const d=parseDate(e.FECHA);return d&&d>=today&&d<=sun;});
+    const monday=new Date(today); monday.setDate(today.getDate()+(dow===0?-6:1-dow));
+    const sunday=new Date(monday); sunday.setDate(monday.getDate()+6); sunday.setHours(23,59,59,999);
+    events=events.filter(e=>{const date=parseDate(e.FECHA);return date&&date>=today&&date<=sunday;});
   } else if (tab==='mes') {
-    ev=ev.filter(e=>{const d=parseDate(e.FECHA);return d&&d>=today&&d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear();});
+    events=events.filter(e=>{const date=parseDate(e.FECHA);return date&&date>=today&&date.getMonth()===today.getMonth()&&date.getFullYear()===today.getFullYear();});
   } else {
-    const cat=CATEGORIES.find(c=>c.id===tab);
-    if (cat) ev=ev.filter(e=>{const d=parseDate(e.FECHA);return d&&d>=today&&cat.keywords.some(k=>(e.ACTIVIDAD||'').toLowerCase().includes(k));});
+    const category=CATEGORIES.find(c=>c.id===tab);
+    if (category) events=events.filter(e=>{const date=parseDate(e.FECHA);return date&&date>=today&&category.keywords.some(k=>(e.ACTIVIDAD||'').toLowerCase().includes(k));});
   }
-  return ev;
+  return events;
 }
 
 function getActiveCats() {
-  return CATEGORIES.filter(cat=>allEvents.some(e=>cat.keywords.some(k=>(e.ACTIVIDAD||'').toLowerCase().includes(k))));
+  return CATEGORIES.filter(category=>allEvents.some(event=>category.keywords.some(k=>(event.ACTIVIDAD||'').toLowerCase().includes(k))));
 }
 
-// ── Tabs ─────────────────────────────────────────────────────────
 function buildTabs() {
-  const allTabs=[...FIXED_TABS,...getActiveCats().map(c=>({id:c.id,label:c.label,icon:c.icon}))];
+  const tabs=[...FIXED_TABS,...getActiveCats().map(c=>({id:c.id,label:c.label,icon:c.icon}))];
   const row=document.getElementById('tabsRow');
-  row.innerHTML=allTabs.map(t=>{
-    const count=filterEvents(t.id).length;
-    return `<div class="tab ${t.id===currentTab?'active':''}" data-tab="${t.id}">
-      ${t.icon} ${t.label} <span class="tab-count">${count}</span>
-    </div>`;
+  row.innerHTML=tabs.map(tab=>{
+    const count=filterEvents(tab.id).length;
+    return `<button class="tab ${tab.id===currentTab?'active':''}" data-tab="${tab.id}" type="button">${tab.icon} ${tab.label} <span class="tab-count">${count}</span></button>`;
   }).join('');
   row.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{
-    currentTab=tab.dataset.tab;
-    setView('agenda');
-    buildTabs(); render();
+    currentTab=tab.dataset.tab; setView('agenda'); buildTabs(); render();
   }));
 }
 
-// ── Header stats ─────────────────────────────────────────────────
 function updateHeaderStats() {
   const today=new Date(); today.setHours(0,0,0,0);
-  const todayEvts=allEvents.filter(e=>{const d=parseDate(e.FECHA);return d&&sameDay(d,today);});
-  const conf=todayEvts.filter(e=>getStatus(e)==='Confirmada').length;
-  const pend=todayEvts.filter(e=>getStatus(e)==='Pendiente').length;
+  const todayEvents=allEvents.filter(e=>sameDay(parseDate(e.FECHA),today));
+  const confirmed=todayEvents.filter(e=>getStatus(e)==='Confirmada').length;
+  const toConfirm=todayEvents.filter(e=>getStatus(e)==='Por Confirmar').length;
+  const special=todayEvents.filter(isSpecialActivity).length;
   document.getElementById('headerStats').innerHTML=`
-    <div class="stat-chip"><span class="dot" style="background:#4caf50"></span>${conf} confirmadas hoy</div>
-    ${pend?`<div class="stat-chip"><span class="dot" style="background:#ff9800"></span>${pend} pendientes</div>`:''}
+    <div class="stat-chip"><span class="dot" style="background:#00e676"></span>${confirmed} confirmada${confirmed===1?'':'s'} hoy</div>
+    ${toConfirm?`<div class="stat-chip"><span class="dot" style="background:#b978f0"></span>${toConfirm} por confirmar</div>`:''}
+    ${special?`<div class="stat-chip"><span class="dot" style="background:#ffd54a"></span>${special} especial${special===1?'':'es'}</div>`:''}
     <div class="stat-chip">📋 ${allEvents.length} total</div>`;
 }
 
-// ── Cards ─────────────────────────────────────────────────────────
-function modalClass(m) {
-  if (!m) return '';
-  const ml=m.toLowerCase();
-  return ml.includes('zoom')?'zoom':ml.includes('presencial')?'presencial':'otro';
-}
-function badgeClass(m) {
-  if (!m) return 'b-otro';
-  const ml=m.toLowerCase();
-  return ml.includes('zoom')?'b-zoom':ml.includes('presencial')?'b-presencial':'b-otro';
-}
-function timeToMin(t) { if(!t)return -1; const p=t.split(':'); return (parseInt(p[0])||0)*60+(parseInt(p[1])||0); }
-function statusEmoji(s) { return s==='Confirmada'?'✓':s==='Pendiente'?'⏳':'✕'; }
-function statusPillClass(s) { return s==='Pendiente'?'s-pendiente':s==='Cancelada'?'s-cancelada':'s-confirmada'; }
-
-function renderCard(e) {
-  const status=getStatus(e);
-  const mc=modalClass(e.MODALIDAD);
-  const isZoom=mc==='zoom';
-  const key=eventKey(e);
+function renderCard(event) {
+  const status=getStatus(event);
+  const modality=modalityMeta(event.MODALIDAD);
+  const special=isSpecialActivity(event);
+  const key=escapeHTML(eventKey(event));
+  const banner=special
+    ? `<div class="mode-banner mode-special"><span class="mode-icon">⭐</span> PERMISO · CURSO · VACACIONES</div>`
+    : `<div class="mode-banner mode-${modality.className}"><span class="mode-icon">${modality.icon}</span> ${modality.label}</div>`;
   return `
-    <div class="event-card ${mc} ${status==='Cancelada'?'cancelada':''}" data-key="${key}">
-      ${isZoom
-        ? `<div class="zoom-banner"><span class="zicon">💻</span> REUNIÓN VIRTUAL · ZOOM</div>`
-        : `<div class="presencial-banner"><span class="picon">📍</span> ACTIVIDAD PRESENCIAL</div>`
-      }
+    <article class="event-card ${modality.className} ${special?'special':''} ${status==='Cancelada'?'cancelada':''}" data-key="${key}" data-row="${event._row||''}">
+      ${banner}
       <div class="card-top">
-        <div class="time-bubble ${e.HORA?'':'no-time'}">
-          <div class="t-hour">${e.HORA?formatTime(e.HORA):'S/H'}</div>
-        </div>
+        <div class="time-bubble ${event.HORA?'':'no-time'}"><div class="t-hour">${event.HORA?escapeHTML(formatTime(event.HORA)):'S/H'}</div></div>
         <div class="card-body">
-          <div class="card-title">${e.ACTIVIDAD}</div>
+          <div class="card-title">${escapeHTML(event.ACTIVIDAD)}</div>
           <div class="card-badges">
-            ${e.LUGAR?`<span class="badge b-lugar">🏛 ${e.LUGAR}</span>`:''}
-            ${e.PARTICIPANTES?`<span class="badge b-personas">👥 ${e.PARTICIPANTES}</span>`:''}
+            <span class="badge ${modality.badge}">${modality.icon} ${escapeHTML(normalizeModality(event.MODALIDAD))}</span>
+            ${special?'<span class="badge b-special">⭐ Destacada</span>':''}
+            ${event.LUGAR?`<span class="badge b-lugar">🏛 ${escapeHTML(event.LUGAR)}</span>`:''}
+            ${event.PARTICIPANTES?`<span class="badge b-personas">👥 ${escapeHTML(event.PARTICIPANTES)}</span>`:''}
           </div>
         </div>
       </div>
       <div class="status-row">
-        <div class="status-pill ${statusPillClass(status)}" data-key="${key}">
-          ${statusEmoji(status)} ${status} <span class="chevron">▾</span>
+        <button class="status-pill ${statusPillClass(status)}" data-key="${key}" type="button" aria-label="Cambiar estado de ${escapeHTML(event.ACTIVIDAD)}">
+          ${statusEmoji(status)} ${escapeHTML(status)} <span class="chevron">▾</span>
+        </button>
+        <div class="event-actions">
+          <button class="card-action edit" data-key="${key}" type="button" title="Editar actividad" aria-label="Editar ${escapeHTML(event.ACTIVIDAD)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+          </button>
+          <button class="card-action delete" data-key="${key}" type="button" title="Eliminar actividad" aria-label="Eliminar ${escapeHTML(event.ACTIVIDAD)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5"/><path d="M14 11v5"/></svg>
+          </button>
         </div>
       </div>
-    </div>`;
+    </article>`;
 }
 
 function renderGroups(events) {
   if (!events.length) return `<div class="empty"><div class="icon">📭</div><p>No hay actividades<br>para este período</p></div>`;
   const grouped={};
-  events.forEach(e=>{if(!grouped[e.FECHA])grouped[e.FECHA]=[];grouped[e.FECHA].push(e);});
+  events.forEach(event=>{ if(!grouped[event.FECHA]) grouped[event.FECHA]=[]; grouped[event.FECHA].push(event); });
   return Object.keys(grouped).sort((a,b)=>parseDate(a)-parseDate(b)).map(key=>{
     const date=parseDate(key);
+    const sorted=grouped[key].sort((a,b)=>timeToMin(a.HORA)-timeToMin(b.HORA));
     const dayName=date?date.toLocaleDateString('es-CL',{weekday:'long'}):'';
     const dayNum=date?date.getDate():'';
-    const monName=date?date.toLocaleDateString('es-CL',{month:'short'}):'';
-    const sorted=grouped[key].sort((a,b)=>timeToMin(a.HORA)-timeToMin(b.HORA));
-    return `<div class="date-group">
+    const month=date?date.toLocaleDateString('es-CL',{month:'short'}):'';
+    return `<section class="date-group">
       <div class="date-header">
-        <div class="date-circle"><div class="day-num">${dayNum}</div><div class="day-mon">${monName}</div></div>
-        <div class="date-info">
-          <div class="day-name">${dayName}</div>
-          <div class="day-count">${sorted.length} ${sorted.length===1?'actividad':'actividades'}</div>
-        </div>
+        <div class="date-circle"><div class="day-num">${dayNum}</div><div class="day-mon">${month}</div></div>
+        <div class="date-info"><div class="day-name">${dayName}</div><div class="day-count">${sorted.length} ${sorted.length===1?'actividad':'actividades'}</div></div>
         <div class="date-divider"></div>
       </div>
-      ${sorted.map(e=>renderCard(e)).join('')}
-    </div>`;
+      ${sorted.map(renderCard).join('')}
+    </section>`;
   }).join('');
 }
 
-// ── Calendar ─────────────────────────────────────────────────────
 function renderCalendar() {
-  const y=calendarDate.getFullYear(), m=calendarDate.getMonth();
+  const year=calendarDate.getFullYear(), month=calendarDate.getMonth();
   const today=new Date(); today.setHours(0,0,0,0);
   const monthName=calendarDate.toLocaleDateString('es-CL',{month:'long',year:'numeric'});
-  const firstDay=new Date(y,m,1);
-  let startDow=firstDay.getDay(); if(startDow===0)startDow=7;
-  const lastDay=new Date(y,m+1,0);
-  const evDates=new Set(allEvents.filter(e=>{const d=parseDate(e.FECHA);return d&&d.getMonth()===m&&d.getFullYear()===y;}).map(e=>e.FECHA));
+  const firstDay=new Date(year,month,1);
+  let startDow=firstDay.getDay(); if(startDow===0) startDow=7;
+  const lastDay=new Date(year,month+1,0);
+  const monthEvents=allEvents.filter(e=>{const date=parseDate(e.FECHA);return date&&date.getMonth()===month&&date.getFullYear()===year;});
+  const eventDates=new Set(monthEvents.map(e=>e.FECHA));
+  const specialDates=new Set(monthEvents.filter(isSpecialActivity).map(e=>e.FECHA));
   const cells=[];
-  for(let i=1;i<startDow;i++)cells.push({date:new Date(y,m,1-(startDow-i)),cur:false});
-  for(let d=1;d<=lastDay.getDate();d++)cells.push({date:new Date(y,m,d),cur:true});
-  while(cells.length%7!==0){const l=cells[cells.length-1].date;cells.push({date:new Date(l.getFullYear(),l.getMonth(),l.getDate()+1),cur:false});}
-  const cellsHtml=cells.map(c=>{
-    const isT=sameDay(c.date,today);
-    const ds=`${String(c.date.getDate()).padStart(2,'0')}/${String(c.date.getMonth()+1).padStart(2,'0')}/${c.date.getFullYear()}`;
-    const isSel=selectedCalDate&&sameDay(c.date,selectedCalDate);
-    return `<div class="cal-cell ${!c.cur?'other-month':''} ${isT?'today':''} ${evDates.has(ds)?'has-events':''} ${isSel&&!isT?'selected':''}" data-date="${ds}">${c.date.getDate()}</div>`;
+  for(let i=1;i<startDow;i++) cells.push({date:new Date(year,month,1-(startDow-i)),current:false});
+  for(let day=1;day<=lastDay.getDate();day++) cells.push({date:new Date(year,month,day),current:true});
+  while(cells.length%7!==0){const last=cells[cells.length-1].date;cells.push({date:new Date(last.getFullYear(),last.getMonth(),last.getDate()+1),current:false});}
+  const cellsHTML=cells.map(cell=>{
+    const ds=`${String(cell.date.getDate()).padStart(2,'0')}/${String(cell.date.getMonth()+1).padStart(2,'0')}/${cell.date.getFullYear()}`;
+    const isToday=sameDay(cell.date,today);
+    const isSelected=selectedCalDate&&sameDay(cell.date,selectedCalDate);
+    return `<button class="cal-cell ${!cell.current?'other-month':''} ${isToday?'today':''} ${eventDates.has(ds)?'has-events':''} ${specialDates.has(ds)?'has-special':''} ${isSelected&&!isToday?'selected':''}" data-date="${ds}" type="button" aria-label="${ds}">${cell.date.getDate()}</button>`;
   }).join('');
   let detail='';
-  if(selectedCalDate){
+  if (selectedCalDate) {
     const ds=`${String(selectedCalDate.getDate()).padStart(2,'0')}/${String(selectedCalDate.getMonth()+1).padStart(2,'0')}/${selectedCalDate.getFullYear()}`;
-    const dayEvts=allEvents.filter(e=>e.FECHA===ds).sort((a,b)=>timeToMin(a.HORA)-timeToMin(b.HORA));
+    const dayEvents=allEvents.filter(e=>e.FECHA===ds).sort((a,b)=>timeToMin(a.HORA)-timeToMin(b.HORA));
     const label=selectedCalDate.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
-    detail=`<div style="margin-top:14px;border-top:1px solid rgba(255,255,255,0.08);padding-top:12px">
-      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:10px;text-transform:capitalize">${label}</div>
-      ${dayEvts.length?dayEvts.map(e=>renderCard(e)).join(''):'<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:14px">Sin actividades</div>'}
+    detail=`<div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px">
+      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.48);margin-bottom:10px;text-transform:capitalize">${label}</div>
+      ${dayEvents.length?dayEvents.map(renderCard).join(''):'<div style="text-align:center;color:rgba(255,255,255,.24);font-size:13px;padding:14px">Sin actividades</div>'}
     </div>`;
   }
   return `<div class="calendar-card">
-    <div class="cal-header">
-      <button class="cal-nav" id="calPrev">‹</button>
-      <div class="cal-title">${monthName.charAt(0).toUpperCase()+monthName.slice(1)}</div>
-      <button class="cal-nav" id="calNext">›</button>
-    </div>
+    <div class="cal-header"><button class="cal-nav" id="calPrev" type="button" aria-label="Mes anterior">‹</button><div class="cal-title">${monthName.charAt(0).toUpperCase()+monthName.slice(1)}</div><button class="cal-nav" id="calNext" type="button" aria-label="Mes siguiente">›</button></div>
     <div class="cal-days-header">${['Lu','Ma','Mi','Ju','Vi','Sa','Do'].map(d=>`<span>${d}</span>`).join('')}</div>
-    <div class="cal-grid" id="calGrid">${cellsHtml}</div>
+    <div class="cal-grid" id="calGrid">${cellsHTML}</div>
+    <div class="calendar-legend"><span class="legend-item"><span class="legend-dot"></span>Con actividades</span><span class="legend-item"><span class="legend-dot special"></span>Permisos, cursos o vacaciones</span></div>
     ${detail}
   </div>`;
 }
 
-// ── Render ───────────────────────────────────────────────────────
 function render() {
   const content=document.getElementById('content');
-  const ts=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-  let html=`<div class="updated-bar">Actualizado ${ts}</div>`;
-  if (currentView==='calendario') {
-    html+=renderCalendar();
-  } else if (currentView==='mes') {
-    html+=renderGroups(filterEvents('mes'));
-  } else {
-    html+=renderGroups(filterEvents(currentTab));
-  }
+  const timestamp=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  let html=`<div class="updated-bar">Actualizado ${timestamp}</div>`;
+  if (currentView==='calendario') html+=renderCalendar();
+  else if (currentView==='mes') html+=renderGroups(filterEvents('mes'));
+  else html+=renderGroups(filterEvents(currentTab));
   content.innerHTML=html;
-  bindStatusPills();
+  bindCardActions();
   if (currentView==='calendario') {
     document.getElementById('calPrev')?.addEventListener('click',()=>{calendarDate.setMonth(calendarDate.getMonth()-1);render();});
     document.getElementById('calNext')?.addEventListener('click',()=>{calendarDate.setMonth(calendarDate.getMonth()+1);render();});
-    document.getElementById('calGrid')?.addEventListener('click',e=>{
-      const cell=e.target.closest('.cal-cell');
-      if(!cell?.dataset.date)return;
-      const [d,m,y]=cell.dataset.date.split('/');
-      selectedCalDate=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
-      render();
+    document.getElementById('calGrid')?.addEventListener('click',event=>{
+      const cell=event.target.closest('.cal-cell'); if(!cell?.dataset.date) return;
+      const [d,m,y]=cell.dataset.date.split('/').map(Number);
+      selectedCalDate=new Date(y,m-1,d); render();
     });
   }
 }
 
-// ── Llamada a Google Script (triple método para máxima confiabilidad) ──
-function callScript(url) {
-  const t = Date.now();
-  // Método 1: fetch sin-cors
-  fetch(url + '&m=1&t=' + t, {mode:'no-cors'}).catch(()=>{});
-  // Método 2: imagen (bypass CORS)
-  const img = new Image();
-  img.src = url + '&m=2&t=' + (t+1);
-  // Método 3: iframe oculto
-  try {
-    const fr = document.createElement('iframe');
-    fr.style.cssText = 'display:none;width:0;height:0;border:0';
-    fr.src = url + '&m=3&t=' + (t+2);
-    document.body.appendChild(fr);
-    setTimeout(()=>{ try{document.body.removeChild(fr);}catch(e){} }, 8000);
-  } catch(e) {}
-}
+function findEventByKey(key) { return allEvents.find(event=>eventKey(event)===key); }
 
-// ── Status dropdown ──────────────────────────────────────────────
 function closeDropdown() {
   if (activeDropdown) { activeDropdown.remove(); activeDropdown=null; }
 }
 
-function bindStatusPills() {
-  document.querySelectorAll('.status-pill').forEach(pill=>{
-    pill.addEventListener('click', e=>{
-      e.stopPropagation();
-      closeDropdown();
-      const key=pill.dataset.key;
-      const current=getStatus(allEvents.find(ev=>eventKey(ev)===key)||{});
-      const opts=[
-        {s:'Confirmada',color:'#1b5e20',dot:'#4caf50'},
-        {s:'Pendiente', color:'#e65100',dot:'#ff9800'},
-        {s:'Cancelada', color:'#b71c1c',dot:'#f44336'},
-      ];
-      const dd=document.createElement('div');
-      dd.className='status-dropdown';
-      dd.innerHTML=opts.map(o=>`
-        <div class="status-option" data-s="${o.s}" style="color:${o.color}">
-          <span class="opt-dot" style="background:${o.dot}"></span>
-          ${o.s==='Confirmada'?'✓':o.s==='Pendiente'?'⏳':'✕'} ${o.s}
-          ${current===o.s?' ✔':''}
-        </div>`).join('');
-      document.body.appendChild(dd);
-      const rect=pill.getBoundingClientRect();
-      const ddH=opts.length*44;
-      const top=rect.bottom+4+ddH>window.innerHeight ? rect.top-ddH-4 : rect.bottom+4;
-      dd.style.top=top+'px';
-      dd.style.left=Math.min(rect.left, window.innerWidth-190)+'px';
-      activeDropdown=dd;
+document.addEventListener('click',closeDropdown);
 
-      dd.querySelectorAll('.status-option').forEach(opt=>{
-        opt.addEventListener('click', async ev=>{
-          ev.stopPropagation();
-          const newStatus=opt.dataset.s;
-          statusOverrides[key]=newStatus;
-          localStorage.setItem('statusOverrides',JSON.stringify(statusOverrides));
-          closeDropdown();
-
-          // Actualizar tarjeta en el lugar SIN recargar toda la vista
-          const card=document.querySelector(`.event-card[data-key="${key}"]`);
-          if (card) {
-            const p=card.querySelector('.status-pill');
-            if (p) {
-              p.className=`status-pill ${statusPillClass(newStatus)}`;
-              p.innerHTML=`${statusEmoji(newStatus)} ${newStatus} <span class="chevron">▾</span>`;
-            }
-            if (newStatus==='Cancelada') {
-              card.classList.add('cancelada');
-              card.querySelector('.card-title')&&(card.querySelector('.card-title').style.textDecoration='line-through');
-            } else {
-              card.classList.remove('cancelada');
-              card.querySelector('.card-title')&&(card.querySelector('.card-title').style.textDecoration='');
-            }
-          }
-
-          // Sincronizar con Google Sheets
-          if (SCRIPT_URL) {
-            const [fecha,hora,...actParts]=key.split('|');
-            const actividad=actParts.join('|');
-            const url=SCRIPT_URL+'?accion=estado&fecha='+encodeURIComponent(fecha)+'&hora='+encodeURIComponent(hora)+'&actividad='+encodeURIComponent(actividad)+'&estado='+encodeURIComponent(newStatus);
-            callScript(url);
-          }
-          showToast('✓ Estado: '+newStatus);
-        });
-      });
-    });
-  });
+function openStatusDropdown(pill,event) {
+  closeDropdown();
+  const current=getStatus(event);
+  const dropdown=document.createElement('div');
+  dropdown.className='status-dropdown';
+  dropdown.innerHTML=STATUS_OPTIONS.map(option=>`<button class="status-option" data-status="${option.s}" type="button" style="color:${option.color}"><span class="opt-dot" style="background:${option.dot}"></span>${option.icon} ${option.s}${current===option.s?' ✔':''}</button>`).join('');
+  document.body.appendChild(dropdown);
+  const rect=pill.getBoundingClientRect();
+  const height=STATUS_OPTIONS.length*44;
+  dropdown.style.top=(rect.bottom+4+height>window.innerHeight?Math.max(8,rect.top-height-4):rect.bottom+4)+'px';
+  dropdown.style.left=Math.max(8,Math.min(rect.left,window.innerWidth-205))+'px';
+  activeDropdown=dropdown;
+  dropdown.querySelectorAll('.status-option').forEach(option=>option.addEventListener('click',async click=>{
+    click.stopPropagation();
+    const newStatus=option.dataset.status;
+    event.ESTADO=newStatus;
+    closeDropdown(); updateHeaderStats(); buildTabs(); render();
+    try {
+      await sendScriptAction('estado',{fila:event._row,fecha:event.FECHA,hora:event.HORA,actividad:event.ACTIVIDAD,estado:newStatus});
+      showToast(`✓ Estado actualizado: ${newStatus}`);
+      scheduleRefresh();
+    } catch (error) { showToast('⚠️ No fue posible sincronizar el estado'); }
+  }));
 }
 
-document.addEventListener('click', closeDropdown);
+function bindCardActions() {
+  document.querySelectorAll('.status-pill').forEach(pill=>pill.addEventListener('click',event=>{
+    event.stopPropagation(); const item=findEventByKey(pill.dataset.key); if(item) openStatusDropdown(pill,item);
+  }));
+  document.querySelectorAll('.card-action.edit').forEach(button=>button.addEventListener('click',event=>{
+    event.stopPropagation(); const item=findEventByKey(button.dataset.key); if(item) openActivityModal('edit',item);
+  }));
+  document.querySelectorAll('.card-action.delete').forEach(button=>button.addEventListener('click',event=>{
+    event.stopPropagation(); const item=findEventByKey(button.dataset.key); if(item) openDeleteModal(item);
+  }));
+}
 
-// ── Bottom nav ───────────────────────────────────────────────────
 function setView(view) {
   currentView=view;
-  document.querySelectorAll('.nav-btn:not(.nav-add)').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn:not(.nav-add)').forEach(button=>button.classList.remove('active'));
   const map={agenda:'navAgenda',calendario:'navCalendar',buscar:'navSearch',mes:'navMes'};
   document.getElementById(map[view])?.classList.add('active');
-  const si=document.getElementById('searchInfo');
-  const sb=document.querySelector('.search-bar');
-  if (view==='buscar') { sb.style.display='flex'; searchInput.focus(); }
-  else sb.style.display='';
-  si.style.display='none';
-  document.getElementById('searchInput').value='';
+  const searchInfo=document.getElementById('searchInfo');
+  const searchBar=document.querySelector('.search-bar');
+  if (view==='buscar') { searchBar.style.display='flex'; setTimeout(()=>searchInput.focus(),50); }
+  else searchBar.style.display='';
+  searchInfo.style.display='none';
+  searchInput.value='';
 }
 
-document.getElementById('navAgenda').addEventListener('click',()=>{
-  currentTab='hoy'; setView('agenda'); buildTabs(); render();
-});
+document.getElementById('navAgenda').addEventListener('click',()=>{currentTab='hoy';setView('agenda');buildTabs();render();});
 document.getElementById('navCalendar').addEventListener('click',()=>{setView('calendario');render();});
 document.getElementById('navMes').addEventListener('click',()=>{setView('mes');render();});
-document.getElementById('navSearch').addEventListener('click',()=>{
-  setView('buscar');
-  setTimeout(()=>document.getElementById('searchInput').focus(), 100);
-});
+document.getElementById('navSearch').addEventListener('click',()=>setView('buscar'));
 
-// ── Add modal ────────────────────────────────────────────────────
-const addModal=document.getElementById('addModal');
-document.getElementById('navAdd').addEventListener('click',()=>{
-  // Pre-fill today's date
-  const today=new Date();
-  document.getElementById('fFecha').value=today.toISOString().split('T')[0];
+const activityModal=document.getElementById('activityModal');
+const deleteModal=document.getElementById('deleteModal');
+
+function resetActivityForm() {
+  ['fHora','fActividad','fLugar','fParticipantes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fModalidad').value='Presencial';
+  document.getElementById('fEstado').value='Confirmada';
   document.getElementById('formMsg').textContent='';
-  addModal.classList.add('open');
-});
-document.getElementById('btnCancelarModal').addEventListener('click',()=>addModal.classList.remove('open'));
-addModal.addEventListener('click',e=>{if(e.target===addModal)addModal.classList.remove('open');});
+}
 
-document.getElementById('btnGuardar').addEventListener('click', async ()=>{
-  const fecha=document.getElementById('fFecha').value;
-  const hora=document.getElementById('fHora').value;
-  const actividad=document.getElementById('fActividad').value.trim();
-  const modalidad=document.getElementById('fModalidad').value;
-  const estado=document.getElementById('fEstado').value;
-  const lugar=document.getElementById('fLugar').value.trim();
-  const participantes=document.getElementById('fParticipantes').value.trim();
-
-  if (!fecha||!actividad) { document.getElementById('formMsg').textContent='⚠️ Completa Fecha y Actividad'; return; }
-
-  // Format date dd/mm/yyyy
-  const [y,m,d]=fecha.split('-');
-  const fechaFmt=`${d}/${m}/${y}`;
-  const diaSemana=new Date(parseInt(y),parseInt(m)-1,parseInt(d)).toLocaleDateString('es-CL',{weekday:'long'});
-  const diaCapit=diaSemana.charAt(0).toUpperCase()+diaSemana.slice(1);
-
-  const btn=document.getElementById('btnGuardar');
-  btn.disabled=true; btn.textContent='Guardando…';
-  const msg=document.getElementById('formMsg');
-
-  if (SCRIPT_URL) {
-    try {
-      const url=SCRIPT_URL+'?accion=nueva&fecha='+encodeURIComponent(fechaFmt)+'&dia='+encodeURIComponent(diaCapit)+'&hora='+encodeURIComponent(hora)+'&modalidad='+encodeURIComponent(modalidad)+'&actividad='+encodeURIComponent(actividad)+'&lugar='+encodeURIComponent(lugar)+'&participantes='+encodeURIComponent(participantes)+'&estado='+encodeURIComponent(estado);
-      await fetch(url,{mode:'no-cors'});
-      showToast('✓ Actividad guardada en Google Sheets');
-      addModal.classList.remove('open');
-      setTimeout(()=>loadData(), 2000);
-    } catch {
-      msg.textContent='⚠️ No se pudo guardar. Configura el Script primero.';
-    }
+function openActivityModal(mode,event=null) {
+  editingEvent=mode==='edit'?event:null;
+  resetActivityForm();
+  const title=document.getElementById('activityModalTitle');
+  const subtitle=document.getElementById('activityModalSubtitle');
+  const save=document.getElementById('btnGuardar');
+  if (editingEvent) {
+    title.textContent='✏️ Editar actividad';
+    subtitle.textContent='Modifica la fecha, actividad, modalidad, estado y demás antecedentes.';
+    save.textContent='Guardar cambios';
+    document.getElementById('fFecha').value=dateToInput(editingEvent.FECHA);
+    document.getElementById('fHora').value=formatTime(editingEvent.HORA);
+    document.getElementById('fActividad').value=editingEvent.ACTIVIDAD||'';
+    document.getElementById('fModalidad').value=normalizeModality(editingEvent.MODALIDAD);
+    document.getElementById('fEstado').value=getStatus(editingEvent);
+    document.getElementById('fLugar').value=editingEvent.LUGAR||'';
+    document.getElementById('fParticipantes').value=editingEvent.PARTICIPANTES||'';
   } else {
-    msg.textContent='⚠️ Configura el Google Apps Script para guardar en la planilla.';
+    title.textContent='➕ Nueva actividad'; subtitle.textContent='Registra la actividad y sus antecedentes principales.'; save.textContent='Guardar actividad';
+    document.getElementById('fFecha').value=new Date().toISOString().split('T')[0];
   }
-  btn.disabled=false; btn.textContent='Guardar en Google Sheets';
+  activityModal.classList.add('open');
+  setTimeout(()=>document.getElementById('fActividad').focus(),280);
+}
+
+function closeActivityModal() { activityModal.classList.remove('open'); editingEvent=null; }
+
+document.getElementById('navAdd').addEventListener('click',()=>openActivityModal('add'));
+document.getElementById('btnCancelarModal').addEventListener('click',closeActivityModal);
+document.getElementById('btnCloseActivityModal').addEventListener('click',closeActivityModal);
+activityModal.addEventListener('click',event=>{if(event.target===activityModal)closeActivityModal();});
+
+function getFormEvent() {
+  const inputDate=document.getElementById('fFecha').value;
+  return {
+    FECHA:inputToDate(inputDate),
+    'DÍA':dayNameFromInput(inputDate),
+    HORA:document.getElementById('fHora').value,
+    MODALIDAD:normalizeModality(document.getElementById('fModalidad').value),
+    ACTIVIDAD:document.getElementById('fActividad').value.trim(),
+    LUGAR:document.getElementById('fLugar').value.trim(),
+    PARTICIPANTES:document.getElementById('fParticipantes').value.trim(),
+    ESTADO:normalizeStatus(document.getElementById('fEstado').value),
+  };
+}
+
+document.getElementById('btnGuardar').addEventListener('click',async()=>{
+  const data=getFormEvent();
+  const message=document.getElementById('formMsg');
+  const button=document.getElementById('btnGuardar');
+  if (!data.FECHA||!data.ACTIVIDAD) { message.textContent='⚠️ Completa la fecha y la actividad.'; return; }
+  button.disabled=true; button.textContent=editingEvent?'Guardando cambios…':'Guardando…'; message.textContent='';
+  try {
+    if (editingEvent) {
+      const original={...editingEvent};
+      Object.assign(editingEvent,data);
+      await sendScriptAction('editar',{
+        fila:original._row,fechaOriginal:original.FECHA,horaOriginal:original.HORA,actividadOriginal:original.ACTIVIDAD,
+        fecha:data.FECHA,dia:data['DÍA'],hora:data.HORA,modalidad:data.MODALIDAD,actividad:data.ACTIVIDAD,
+        lugar:data.LUGAR,participantes:data.PARTICIPANTES,estado:data.ESTADO
+      });
+      showToast('✓ Actividad actualizada');
+    } else {
+      const tempRow=Math.max(1,...allEvents.map(e=>Number(e._row)||1))+1;
+      allEvents.push({...data,_row:tempRow});
+      await sendScriptAction('nueva',{
+        fecha:data.FECHA,dia:data['DÍA'],hora:data.HORA,modalidad:data.MODALIDAD,actividad:data.ACTIVIDAD,
+        lugar:data.LUGAR,participantes:data.PARTICIPANTES,estado:data.ESTADO
+      });
+      showToast('✓ Actividad creada');
+    }
+    closeActivityModal(); updateHeaderStats(); buildTabs(); render(); scheduleRefresh();
+  } catch (error) {
+    message.textContent='⚠️ No fue posible sincronizar con la planilla.';
+  } finally {
+    button.disabled=false; button.textContent=editingEvent?'Guardar cambios':'Guardar actividad';
+  }
 });
 
-// ── Search ───────────────────────────────────────────────────────
+function openDeleteModal(event) {
+  pendingDeleteEvent=event;
+  document.getElementById('deleteActivityName').textContent=`“${event.ACTIVIDAD}”`;
+  document.getElementById('deleteMsg').textContent='';
+  deleteModal.classList.add('open');
+}
+
+function closeDeleteModal() { deleteModal.classList.remove('open'); pendingDeleteEvent=null; }
+
+document.getElementById('btnCloseDeleteModal').addEventListener('click',closeDeleteModal);
+document.getElementById('btnCancelDelete').addEventListener('click',closeDeleteModal);
+deleteModal.addEventListener('click',event=>{if(event.target===deleteModal)closeDeleteModal();});
+
+document.getElementById('btnConfirmDelete').addEventListener('click',async()=>{
+  if(!pendingDeleteEvent) return;
+  const item=pendingDeleteEvent;
+  const button=document.getElementById('btnConfirmDelete');
+  const message=document.getElementById('deleteMsg');
+  button.disabled=true; button.textContent='Eliminando…'; message.textContent='';
+  try {
+    await sendScriptAction('eliminar',{fila:item._row,fecha:item.FECHA,hora:item.HORA,actividad:item.ACTIVIDAD});
+    allEvents=allEvents.filter(event=>event!==item);
+    closeDeleteModal(); updateHeaderStats(); buildTabs(); render(); showToast('✓ Actividad eliminada'); scheduleRefresh();
+  } catch (error) { message.textContent='⚠️ No fue posible eliminar la actividad.'; }
+  finally { button.disabled=false; button.textContent='Sí, eliminar actividad'; }
+});
+
+async function sendScriptAction(action,params={}) {
+  if (!SCRIPT_URL) throw new Error('SCRIPT_URL no configurada');
+  const query=new URLSearchParams({accion:action,requestId:`${Date.now()}-${Math.random().toString(36).slice(2,8)}`});
+  Object.entries(params).forEach(([key,value])=>query.set(key,value??''));
+  await fetch(`${SCRIPT_URL}?${query.toString()}`,{mode:'no-cors',cache:'no-store'});
+}
+
+function scheduleRefresh() {
+  clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(()=>loadData({silent:true}),2200);
+}
+
 const MESES={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
 const NUMEROS={uno:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12,trece:13,catorce:14,quince:15,dieciséis:16,dieciseis:16,diecisiete:17,dieciocho:18,diecinueve:19,veinte:20,veintiuno:21,'veintidós':22,veintidos:22,'veintitrés':23,veintitres:23,veinticuatro:24,veinticinco:25,'veintiséis':26,veintiseis:26,veintisiete:27,veintiocho:28,veintinueve:29,treinta:30,'treinta y uno':31};
 
-function parseSpanishQuery(q) {
-  const ql=q.toLowerCase().trim();
-  let targetDate=null;
-  for (const [word,num] of Object.entries(NUMEROS)) {
-    for (const [mes,mesNum] of Object.entries(MESES)) {
-      if (ql.includes(word+' de '+mes)||ql.includes(word+' '+mes)) {
-        targetDate=new Date(new Date().getFullYear(),mesNum,num); break;
-      }
+function parseSpanishQuery(query) {
+  const lower=query.toLowerCase().trim(); let targetDate=null;
+  for (const [word,number] of Object.entries(NUMEROS)) {
+    for (const [monthName,monthNumber] of Object.entries(MESES)) {
+      if (lower.includes(`${word} de ${monthName}`)||lower.includes(`${word} ${monthName}`)) { targetDate=new Date(new Date().getFullYear(),monthNumber,number); break; }
     }
     if (targetDate) break;
   }
-  if (!targetDate) {
-    const mm=ql.match(/(\d{1,2})\s*(?:de\s+)?(\w+)/);
-    if (mm&&MESES[mm[2]]!==undefined) targetDate=new Date(new Date().getFullYear(),MESES[mm[2]],parseInt(mm[1]));
-  }
-  if (!targetDate) {
-    const mm=ql.match(/(\d{1,2})[\/\-](\d{1,2})/);
-    if (mm) targetDate=new Date(new Date().getFullYear(),parseInt(mm[2])-1,parseInt(mm[1]));
-  }
-  return {targetDate,rawQuery:ql};
+  if (!targetDate) { const match=lower.match(/(\d{1,2})\s*(?:de\s+)?(\w+)/); if(match&&MESES[match[2]]!==undefined)targetDate=new Date(new Date().getFullYear(),MESES[match[2]],Number(match[1])); }
+  if (!targetDate) { const match=lower.match(/(\d{1,2})[\/-](\d{1,2})/); if(match)targetDate=new Date(new Date().getFullYear(),Number(match[2])-1,Number(match[1])); }
+  return {targetDate,rawQuery:lower};
 }
 
 function searchEvents(query) {
   if (!query.trim()) return null;
   const {targetDate,rawQuery}=parseSpanishQuery(query);
-  // Si se detectó fecha, filtrar solo por fecha
-  if (targetDate) return allEvents.filter(e=>{const d=parseDate(e.FECHA);return d&&sameDay(d,targetDate);});
-  const getText=e=>[e.ACTIVIDAD,e.LUGAR,e.PARTICIPANTES,e.MODALIDAD].join(' ').toLowerCase();
-  const words=rawQuery.split(' ').filter(w=>w.length>2);
-  // Nivel 1: frase exacta completa
-  let res=allEvents.filter(e=>getText(e).includes(rawQuery));
-  if (res.length) return res;
-  // Nivel 2: todas las palabras clave presentes (AND)
-  res=allEvents.filter(e=>{const t=getText(e);return words.length>0&&words.every(w=>t.includes(w));});
-  if (res.length) return res;
-  // Nivel 3: fallback — al menos una palabra coincide (OR)
-  return allEvents.filter(e=>{const t=getText(e);return words.some(w=>t.includes(w));});
+  if (targetDate) return allEvents.filter(e=>sameDay(parseDate(e.FECHA),targetDate));
+  const getText=e=>[e.ACTIVIDAD,e.LUGAR,e.PARTICIPANTES,normalizeModality(e.MODALIDAD),getStatus(e)].join(' ').toLowerCase();
+  const words=rawQuery.split(' ').filter(word=>word.length>2);
+  let results=allEvents.filter(e=>getText(e).includes(rawQuery));
+  if (results.length) return results;
+  results=allEvents.filter(e=>{const text=getText(e);return words.length>0&&words.every(word=>text.includes(word));});
+  if (results.length) return results;
+  return allEvents.filter(e=>{const text=getText(e);return words.some(word=>text.includes(word));});
 }
 
 const searchInput=document.getElementById('searchInput');
 function handleSearch(query) {
   document.getElementById('clearSearch').style.display=query?'block':'none';
-  const si=document.getElementById('searchInfo');
-  if (!query.trim()) { si.style.display='none'; render(); return; }
+  const info=document.getElementById('searchInfo');
+  if (!query.trim()) { info.style.display='none'; render(); return; }
   const results=searchEvents(query);
-  si.style.display='block';
-  si.textContent=results.length?`${results.length} resultado${results.length!==1?'s':''} para "${query}"`:`Sin resultados para "${query}"`;
-  const content=document.getElementById('content');
-  content.innerHTML=results.length?renderGroups(results):`<div class="empty"><div class="icon">🔍</div><p>Sin resultados para<br><strong>${query}</strong></p></div>`;
-  bindStatusPills();
+  info.style.display='block';
+  info.textContent=results.length?`${results.length} resultado${results.length!==1?'s':''} para “${query}”`:`Sin resultados para “${query}”`;
+  document.getElementById('content').innerHTML=results.length?renderGroups(results):`<div class="empty"><div class="icon">🔍</div><p>Sin resultados para<br><strong>${escapeHTML(query)}</strong></p></div>`;
+  bindCardActions();
 }
+searchInput.addEventListener('input',event=>handleSearch(event.target.value));
+document.getElementById('clearSearch').addEventListener('click',()=>{searchInput.value='';handleSearch('');searchInput.focus();});
 
-searchInput.addEventListener('input',e=>handleSearch(e.target.value));
-document.getElementById('clearSearch').addEventListener('click',()=>{ searchInput.value=''; handleSearch(''); });
-
-// ── Voice ─────────────────────────────────────────────────────────
 const voiceBtn=document.getElementById('voiceBtn');
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-if (!SR) { voiceBtn.style.opacity='.35'; }
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+if (!SpeechRecognition) voiceBtn.style.opacity='.35';
 else {
-  const rec=new SR(); rec.lang='es-CL'; rec.continuous=false; rec.interimResults=false;
-  rec.onstart=()=>voiceBtn.classList.add('listening');
-  rec.onend=()=>voiceBtn.classList.remove('listening');
-  rec.onerror=()=>{ voiceBtn.classList.remove('listening'); showToast('No se pudo escuchar'); };
-  rec.onresult=e=>{ const t=e.results[0][0].transcript; searchInput.value=t; handleSearch(t); };
-  voiceBtn.addEventListener('click',()=>{ if(voiceBtn.classList.contains('listening'))rec.stop(); else{rec.start();showToast('🎙️ Escuchando…');} });
+  const recognition=new SpeechRecognition(); recognition.lang='es-CL'; recognition.continuous=false; recognition.interimResults=false;
+  recognition.onstart=()=>voiceBtn.classList.add('listening');
+  recognition.onend=()=>voiceBtn.classList.remove('listening');
+  recognition.onerror=()=>{voiceBtn.classList.remove('listening');showToast('No se pudo escuchar');};
+  recognition.onresult=event=>{const text=event.results[0][0].transcript;searchInput.value=text;handleSearch(text);};
+  voiceBtn.addEventListener('click',()=>{if(voiceBtn.classList.contains('listening'))recognition.stop();else{recognition.start();showToast('🎙️ Escuchando…');}});
 }
 
-// ── Toast ─────────────────────────────────────────────────────────
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function showToast(message) {
+  const toast=document.getElementById('toast'); toast.textContent=message; toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2800);
 }
 
-// ── Load ──────────────────────────────────────────────────────────
-document.getElementById('refreshBtn').addEventListener('click',loadData);
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Escape') return;
+  closeDropdown();
+  if(activityModal.classList.contains('open')) closeActivityModal();
+  if(deleteModal.classList.contains('open')) closeDeleteModal();
+});
 
-async function loadData() {
-  document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div>Cargando agenda…</div>';
+document.getElementById('refreshBtn').addEventListener('click',()=>loadData());
+
+async function loadData({silent=false}={}) {
+  if (!silent) document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div>Cargando agenda…</div>';
   try {
-    const res=await fetch(CSV_URL+'&t='+Date.now());
-    const text=await res.text();
+    const response=await fetch(`${CSV_URL}&t=${Date.now()}`,{cache:'no-store'});
+    if(!response.ok) throw new Error('No fue posible cargar la planilla');
+    const text=await response.text();
     allEvents=parseCSV(text);
     updateHeaderStats(); buildTabs(); render();
-  } catch {
-    document.getElementById('content').innerHTML='<div class="empty"><div class="icon">⚠️</div><p>Error al cargar.<br>Verifica conexión.</p></div>';
+    if(silent) showToast('↻ Agenda sincronizada');
+  } catch (error) {
+    if(!silent) document.getElementById('content').innerHTML='<div class="empty"><div class="icon">⚠️</div><p>Error al cargar.<br>Verifica la conexión.</p></div>';
   }
 }
 
