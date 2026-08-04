@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Agenda Presidenta" />
-  <title>Agenda Presidenta Gloria Negroni v4</title>
+  <title>Agenda Presidenta Gloria Negroni v4.1</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -1091,13 +1091,17 @@ function openStatusDropdown(pill,event) {
   dropdown.querySelectorAll('.status-option').forEach(option=>option.addEventListener('click',async click=>{
     click.stopPropagation();
     const newStatus=option.dataset.status;
-    event.ESTADO=newStatus;
-    closeDropdown(); updateHeaderStats(); buildTabs(); render();
+    closeDropdown();
+    showToast('Guardando estado…');
     try {
       await sendScriptAction('estado',{fila:event._row,fecha:event.FECHA,hora:event.HORA,actividad:event.ACTIVIDAD,estado:newStatus});
+      event.ESTADO=newStatus;
+      updateHeaderStats(); buildTabs(); render();
       showToast(`✓ Estado actualizado: ${newStatus}`);
       scheduleRefresh();
-    } catch (error) { showToast('⚠️ No fue posible sincronizar el estado'); }
+    } catch (error) {
+      showToast(`⚠️ ${error.message||'No fue posible sincronizar el estado'}`);
+    }
   }));
 }
 
@@ -1196,25 +1200,25 @@ document.getElementById('btnGuardar').addEventListener('click',async()=>{
   try {
     if (editingEvent) {
       const original={...editingEvent};
-      Object.assign(editingEvent,data);
       await sendScriptAction('editar',{
         fila:original._row,fechaOriginal:original.FECHA,horaOriginal:original.HORA,actividadOriginal:original.ACTIVIDAD,
         fecha:data.FECHA,dia:data['DÍA'],hora:data.HORA,modalidad:data.MODALIDAD,actividad:data.ACTIVIDAD,
         lugar:data.LUGAR,participantes:data.PARTICIPANTES,estado:data.ESTADO
       });
+      Object.assign(editingEvent,data);
       showToast('✓ Actividad actualizada');
     } else {
-      const tempRow=Math.max(1,...allEvents.map(e=>Number(e._row)||1))+1;
-      allEvents.push({...data,_row:tempRow});
-      await sendScriptAction('nueva',{
+      const result=await sendScriptAction('nueva',{
         fecha:data.FECHA,dia:data['DÍA'],hora:data.HORA,modalidad:data.MODALIDAD,actividad:data.ACTIVIDAD,
         lugar:data.LUGAR,participantes:data.PARTICIPANTES,estado:data.ESTADO
       });
+      const tempRow=Math.max(1,...allEvents.map(e=>Number(e._row)||1))+1;
+      allEvents.push({...data,_row:Number(result.row)||tempRow});
       showToast('✓ Actividad creada');
     }
     closeActivityModal(); updateHeaderStats(); buildTabs(); render(); scheduleRefresh();
   } catch (error) {
-    message.textContent='⚠️ No fue posible sincronizar con la planilla.';
+    message.textContent=`⚠️ ${error.message||'No fue posible sincronizar con la planilla.'}`;
   } finally {
     button.disabled=false; button.textContent=editingEvent?'Guardar cambios':'Guardar actividad';
   }
@@ -1243,15 +1247,41 @@ document.getElementById('btnConfirmDelete').addEventListener('click',async()=>{
     await sendScriptAction('eliminar',{fila:item._row,fecha:item.FECHA,hora:item.HORA,actividad:item.ACTIVIDAD});
     allEvents=allEvents.filter(event=>event!==item);
     closeDeleteModal(); updateHeaderStats(); buildTabs(); render(); showToast('✓ Actividad eliminada'); scheduleRefresh();
-  } catch (error) { message.textContent='⚠️ No fue posible eliminar la actividad.'; }
+  } catch (error) { message.textContent=`⚠️ ${error.message||'No fue posible eliminar la actividad.'}`; }
   finally { button.disabled=false; button.textContent='Sí, eliminar actividad'; }
 });
 
-async function sendScriptAction(action,params={}) {
-  if (!SCRIPT_URL) throw new Error('SCRIPT_URL no configurada');
-  const query=new URLSearchParams({accion:action,requestId:`${Date.now()}-${Math.random().toString(36).slice(2,8)}`});
-  Object.entries(params).forEach(([key,value])=>query.set(key,value??''));
-  await fetch(`${SCRIPT_URL}?${query.toString()}`,{mode:'no-cors',cache:'no-store'});
+function sendScriptAction(action,params={}) {
+  if (!SCRIPT_URL) return Promise.reject(new Error('SCRIPT_URL no configurada'));
+  return new Promise((resolve,reject)=>{
+    const callbackName=`__agenda_${Date.now()}_${Math.random().toString(36).slice(2,9)}`;
+    const query=new URLSearchParams({
+      accion:action,
+      requestId:`${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+      callback:callbackName
+    });
+    Object.entries(params).forEach(([key,value])=>query.set(key,value??''));
+
+    const script=document.createElement('script');
+    let finished=false;
+    const cleanup=()=>{
+      if(finished) return;
+      finished=true;
+      clearTimeout(timer);
+      script.remove();
+      try { delete window[callbackName]; } catch (_) { window[callbackName]=undefined; }
+    };
+    const fail=message=>{ cleanup(); reject(new Error(message)); };
+    const timer=setTimeout(()=>fail('La planilla no respondió. Revisa la conexión o la implementación de Apps Script.'),15000);
+
+    window[callbackName]=payload=>{
+      if(payload&&payload.ok){ cleanup(); resolve(payload); }
+      else fail(payload?.error||'Google Sheets rechazó la operación.');
+    };
+    script.onerror=()=>fail('No fue posible conectar con Google Apps Script.');
+    script.src=`${SCRIPT_URL}?${query.toString()}`;
+    document.body.appendChild(script);
+  });
 }
 
 function scheduleRefresh() {
